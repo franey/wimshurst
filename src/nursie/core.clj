@@ -2,6 +2,7 @@
   (:use [endophile.core :only [mp to-clj]])
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
+            [clj-time.format :as ctf]
             [net.cgrand.enlive-html :as en])
   (:gen-class))
 
@@ -18,36 +19,20 @@
   (:content (first (en/select (:content post) [:h1]))))
 
 (defn pubdate
-  "Returns post's pubdate (stored in a comment in its enlive nodes.)"
+  "Returns post's pubdate (stored in a comment in its enlive nodes) as an
+  org.joda.time.DateTime."
   [post]
-  (some #(when-let [data (:data %)]
-           (second (re-find #"pubdate:\s*(\S+)" data)))
-        (:content post)))
+  (when-let [datestring (some #(when-let [data (:data %)]
+                                 (second (re-find #"pubdate:\s*(\S+)" data)))
+                              (:content post))]
+    ;; TODO: configurable input format for pubdate
+    (ctf/parse (ctf/formatters :date-time-no-ms) datestring)))
 
 (defn datesort
   "Sorts posts in descending pubdate order"
   [posts]
   ;; TODO: filter out posts w/out a pubdate?
   (reverse (sort-by pubdate posts)))
-
-(defn prettydate
-  ;; TODO: use a standard date library r/than this horror
-  "Turns a date-string in extended ISO8601 format into something 
-  readable."
-  [date-string]
-  (when-let [[_ yyyy mm dd hhmi tz]
-             (re-matches
-               #"(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d:\d\d)(Z|[+-]\d\d:\d\d)"
-               date-string)]
-    (format "%s %s %s, %s UTC%s"
-            dd
-            (nth ["January"    "February"  "March"     "April"
-                  "May"        "June"      "July"      "August"
-                  "September"  "October"   "November"  "December"]
-                 (dec (Integer. mm)))
-            yyyy
-            hhmi
-            (if (#{"Z" "+00:00"} tz) "", tz))))
 
 (defn backlinks
   "Returns those posts that link to uri."
@@ -73,7 +58,12 @@
           [:h1]
           (if-let [pubdate (pubdate post)]
             (en/after
-              (en/html [:time {:datetime pubdate} (prettydate pubdate)]))
+              (en/html
+                [:time
+                 {:datetime (ctf/unparse (ctf/formatters :date-time-no-ms)
+                                         pubdate)}
+                 ;; TODO: configurable display format for pubdate
+                 (ctf/unparse (ctf/formatters :rfc822) pubdate)]))
             identity)
 
           ;; no self-linking
