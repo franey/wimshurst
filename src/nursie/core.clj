@@ -3,7 +3,10 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
             [clj-time.format :as ctf]
-            [net.cgrand.enlive-html :as en])
+            [net.cgrand.enlive-html :as en]
+            [ring.adapter.jetty :as raj]
+            [ring.middleware.file :as rmf]
+            [ring.middleware.file-info :as rmi])
   (:gen-class))
 
 (defn permalink
@@ -131,8 +134,8 @@
 (defn write-post
   "Creates html file for post in the directory at out-path, using the
   file at template-path as a template."
-  [out-path template-path post] 
-  (let [fname (str out-path
+  [root-path template-path post] 
+  (let [fname (str root-path
                    (if (= "/" (permalink post))
                      "/index"
                      (permalink post))
@@ -144,10 +147,23 @@
   (->> (.listFiles (io/file proj-path))
        (filter #(re-find #"\.md$" (.getName %)))
        make-posts
-       ;; TODO: configurable output subdirectory
+       ;; TODO: configurable root-path
        (map (partial write-post
                      (str proj-path "/site")
                      (str proj-path "/template.html")))))
+
+(defn app [root-path]
+  (->
+    (fn [req]
+      ;; TODO: enhanced 404, maybe configurable
+      ((rmf/wrap-file #({:status 404 :body "404: Not Found"}) root-path)
+       (assoc req :uri (str (:uri req) ".html"))))
+    (rmf/wrap-file root-path)
+    (rmi/wrap-file-info)))
+
+(defn serve [proj-path]
+  ;; TODO: configurable root-path
+  (raj/run-jetty (app (str proj-path "/site")) {:port 8080 :join? false}))
 
 (defn -main
   "I don't do a whole lot ... yet."
