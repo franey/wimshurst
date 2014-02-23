@@ -10,4 +10,6 @@
                  [ring "1.2.1"]]
   :main ^:skip-aot nursie.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}}
+  ;:repl-options {:prompt (fn [ns] (str "\u001B[34m" ns "=>\u001B[m "))}
+  )

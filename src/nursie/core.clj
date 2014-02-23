@@ -1,6 +1,7 @@
 (ns nursie.core
   (:use [endophile.core :only [mp to-clj]])
-  (:require [clojure.java.io :as io]
+  (:require [clojure.edn :as edn]
+            [clojure.java.io :as io]
             [clojure.string :as str]
             [clj-time.format :as ctf]
             [net.cgrand.enlive-html :as en]
@@ -9,6 +10,20 @@
             [ring.middleware.file-info :as rmi])
   (:gen-class))
 
+(defn get-config [proj-path]
+  (let [config-file (io/file proj-path "nursie.edn")
+        defaults {:extension "md"
+                  :pubdate-display-format "E, dd MMM yyyy HH:mm:ss Z "
+                  :pubdate-input-format "yyyy-MM-dd'T'HH:mm:ssZ"
+                  :root-path "site"
+                  :source-path "."
+                  :template-path "template.html"}]
+    (if (.exists config-file)
+      (merge defaults (edn/read-string (slurp config-file)))
+      defaults)))
+
+;;; TODO: add a similar but different function for file-path (e.g.
+;;; "post" vs "/post")
 (defn permalink
   "Returns the permalink for a post."
   [post]
@@ -156,7 +171,8 @@
   (->
     (fn [req]
       ;; TODO: enhanced 404, maybe configurable
-      ((rmf/wrap-file #({:status 404 :body "404: Not Found"}) root-path)
+      ((rmf/wrap-file (constantly {:status 404 :body "404: Not Found"})
+                      root-path)
        (assoc req :uri (str (:uri req) ".html"))))
     (rmf/wrap-file root-path)
     (rmi/wrap-file-info)))
