@@ -1,4 +1,4 @@
-(ns nursie.core
+(ns ploppy.core
   (:use [endophile.core :only [mp to-clj]])
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]

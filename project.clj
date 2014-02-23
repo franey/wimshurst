@@ -1,4 +1,4 @@
-(defproject nursie "0.1.0-SNAPSHOT"
+(defproject ploppy "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -8,8 +8,6 @@
                  [endophile "0.1.2"]
                  [enlive "1.1.5"]
                  [ring "1.2.1"]]
-  :main ^:skip-aot nursie.core
+  :main ^:skip-aot ploppy.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}}
-  ;:repl-options {:prompt (fn [ns] (str "\u001B[34m" ns "=>\u001B[m "))}
-  )
+  :profiles {:uberjar {:aot :all}})
