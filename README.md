@@ -1,6 +1,6 @@
-# nursie
+# ploppy
 
-FIXME: description
+A simple, static blog generator, written in Clojure.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Download from http://example.com/FIXME.
 
 FIXME: explanation
 
-    $ java -jar nursie-0.1.0-standalone.jar [args]
+    $ java -jar ploppy-0.1.0-standalone.jar [args]
 
 ## Options
 
@@ -30,7 +30,7 @@ FIXME: listing of options this app accepts.
 
 ## License
 
-Copyright © 2014 FIXME
+Copyright © 2014 Dominic Franey
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.

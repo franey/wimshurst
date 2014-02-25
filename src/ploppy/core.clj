@@ -3,6 +3,7 @@
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.string :as str]
+            [clojure.tools.cli :as cli]
             [clj-time.format :as ctf]
             [net.cgrand.enlive-html :as en]
             [ring.adapter.jetty :as raj]
@@ -177,13 +178,52 @@
     (rmf/wrap-file root-path)
     (rmi/wrap-file-info)))
 
-(defn serve [proj-path]
-  ;; TODO: configurable root-path
-  (raj/run-jetty (app (str proj-path "/site")) {:port 8080 :join? false}))
+(defn serve
+  [proj-path & options]
+  (let [{:keys [port join?] :or {port 8080 join? false}}
+        (apply hash-map options)]
+    ;; TODO: configurable root-path
+    (raj/run-jetty (app (str proj-path "/site")) {:port port :join? join?})))
+
+(def cli-options
+  [["-b" "--build" "Build site"
+    :default true]
+   ["-s" "--serve" "Start a web server"]
+   ["-p" "--port PORT" "Port for web server"
+    :default 8080
+    :parse-fn #(Integer/parseInt %)]
+   ["-h" "--help"]])
+
+(defn usage [options-summary]
+  (str "Usage: java -cp ploppy.jar [options] project-directory"
+       "\n\n"
+       "Options:"
+       options-summary
+       "\n\n"
+       "At least one of -b/--build or -s/--serve must be provided."))
+
+(defn error-msg [errors]
+  (str "These errors occurred while passing your command:\n\n"
+       (str/join \newline errors)))
+
+(defn exit [status msg]
+  (println msg)
+  (System/exit status))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!")) 
+  (let [{:keys [options arguments errors summary]} (cli/parse-opts args
+                                                                   cli-options)
+        [proj-path & _] arguments]
+    (cond
+      (:help options) (exit 0 (usage summary))
+      (not= (count arguments) 1) (exit 1 (usage summary))
+      errors (exit 1 (error-msg errors))
+      (and (:build options) (:serve options)) (do (build proj-path)
+                                                  (serve proj-path))
+      (:build options) (build proj-path)
+      (:serve options) (serve proj-path :port (:port options) :join? true)
+      :else (exit 1 (usage summary))))) 
 
 ;;;; eof
