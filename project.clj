@@ -1,4 +1,4 @@
-(defproject ploppy "0.1.0-SNAPSHOT"
+(defproject wimshurst "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -9,6 +9,6 @@
                  [endophile "0.1.2"]
                  [enlive "1.1.5"]
                  [ring "1.2.1"]]
-  :main ^:skip-aot ploppy.core
+  :main ^:skip-aot wimshurst.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

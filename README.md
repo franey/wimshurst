@@ -1,4 +1,4 @@
-# ploppy
+# wimshurst
 
 A simple, static blog generator, written in Clojure.
 
@@ -10,7 +10,7 @@ Download from http://example.com/FIXME.
 
 FIXME: explanation
 
-    $ java -jar ploppy-0.1.0-standalone.jar [args]
+    $ java -jar wimshurst-0.1.0-standalone.jar [args]
 
 ## Options
 

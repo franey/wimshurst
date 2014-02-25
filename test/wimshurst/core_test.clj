@@ -1,6 +1,6 @@
-(ns ploppy.core-test
+(ns wimshurst.core-test
   (:require [clojure.test :refer :all]
-            [ploppy.core :refer :all]))
+            [wimshurst.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

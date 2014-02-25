@@ -1,4 +1,4 @@
-(ns ploppy.core
+(ns wimshurst.core
   (:use [endophile.core :only [mp to-clj]])
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
@@ -195,7 +195,7 @@
    ["-h" "--help"]])
 
 (defn usage [options-summary]
-  (str "Usage: java -cp ploppy.jar [options] project-directory"
+  (str "Usage: java -cp wimshurst.jar [options] project-directory"
        "\n\n"
        "Options:"
        options-summary
